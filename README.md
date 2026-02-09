@@ -29,7 +29,7 @@ npm start
 ## دیپلوی روی Dokploy
 
 1. در Dokploy یک **Application** جدید بسازید.
-2. منبع را **GitHub** و ریپو `charkhzarrin/DivarAgent` انتخاب کنید.
+2. منبع را **GitHub** و ریپو `wisdomise-dev/DivarAgent` انتخاب کنید.
 3. متغیرهای محیطی را تنظیم کنید:
    - `GEMINI_API_KEY`: کلید AvalAI
    - `HEADLESS`: `true` (برای Docker)
