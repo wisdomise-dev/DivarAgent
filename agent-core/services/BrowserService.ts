@@ -9,7 +9,8 @@ class BrowserService {
   private context: BrowserContext | null = null;
   public page: Page | null = null;
 
-  async launchBrowser(headless: boolean = false): Promise<Page> {
+  async launchBrowser(headless?: boolean): Promise<Page> {
+    if (headless === undefined) headless = process.env.HEADLESS === 'true';
     logger.info(`Launching browser (headless: ${headless})...`);
     const userDataDir = path.resolve(process.cwd(), 'divar-user-data');
     if (!fs.existsSync(userDataDir)) fs.mkdirSync(userDataDir, { recursive: true });

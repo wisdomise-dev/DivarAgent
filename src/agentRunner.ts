@@ -73,7 +73,7 @@ export class AgentRunner {
         throw new Error('Invalid Divar URL.');
       }
 
-      const page = await browserService.launchBrowser(false);
+      const page = await browserService.launchBrowser();
       divarService.setLogCallback((level, msg) => this.log(level, msg));
       await divarService.init(page);
 

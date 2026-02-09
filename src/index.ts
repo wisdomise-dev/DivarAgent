@@ -6,7 +6,7 @@ import { logger } from '../agent-core/utils/logger';
 async function main() {
   try {
     // 1. Launch Browser first (so user can navigate if needed)
-    const page = await browserService.launchBrowser(false); // Headful mode for user interaction
+    const page = await browserService.launchBrowser();
     await divarService.init(page);
 
     // 2. Check for URL or wait for user
