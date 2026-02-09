@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+dashboard.log
+
+# Playwright / Browser
+divar-user-data/
+playwright-report/
+test-results/
+
+# Session
+session.json
+
+# Test files (local)
+test-gemini.ts
+test-avalai.ts
+test-avalai-chat.ts
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

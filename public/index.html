@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Divar Agent Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface-hover: #223044;
+      --border: #2d3a4d;
+      --text: #e6edf3;
+      --text-muted: #8b9cb3;
+      --accent: #00d4aa;
+      --accent-dim: #00a884;
+      --warn: #e6a23c;
+      --error: #f56c6c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Vazirmatn', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    h1::before {
+      content: '';
+      width: 6px;
+      height: 1.2em;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .card h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+    input, button {
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    input::placeholder { color: var(--text-muted); }
+    .btn {
+      padding: 0.65rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .btn-secondary {
+      background: var(--surface-hover);
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-danger {
+      background: var(--error);
+      color: #fff;
+    }
+    .row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .row input { flex: 1; margin-bottom: 0; }
+    .login-form { display: none; }
+    .login-form.visible { display: block; }
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .status-idle { background: var(--border); color: var(--text-muted); }
+    .status-starting, .status-navigating { background: #2d4a6d; color: #7eb8ff; }
+    .status-login_phone, .status-login_otp { background: #4a3d2d; color: var(--warn); }
+    .status-chatting { background: #2d4a3d; color: var(--accent); }
+    .status-price_found { background: #2d4a3d; color: var(--accent); }
+    .status-error { background: #4a2d2d; color: var(--error); }
+    .log-panel {
+      max-height: 320px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      font-family: 'Consolas', 'Monaco', monospace;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 1rem;
+      line-height: 1.5;
+    }
+    .log-line {
+      margin-bottom: 0.25rem;
+    }
+    .log-line .ts { color: var(--text-muted); margin-left: 0.5rem; }
+    .log-line.info { color: var(--text); }
+    .log-line.warn { color: var(--warn); }
+    .log-line.error { color: var(--error); }
+    .price-result {
+      background: var(--bg);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 1rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Divar Agent Dashboard</h1>
+
+    <div class="card">
+      <h2>آدرس آگهی</h2>
+      <input type="url" id="url" placeholder="https://divar.ir/v/..." dir="ltr">
+      <div class="row">
+        <button type="button" class="btn btn-primary" id="startBtn">شروع</button>
+        <button type="button" class="btn btn-danger" id="stopBtn" style="display:none">توقف</button>
+      </div>
+    </div>
+
+    <div class="card login-form" id="phoneForm">
+      <h2>شماره موبایل</h2>
+      <input type="tel" id="phone" placeholder="۰۹۱۲۳۴۵۶۷۸۹" dir="ltr">
+      <button type="button" class="btn btn-primary" id="phoneSubmit">ارسال</button>
+    </div>
+
+    <div class="card login-form" id="otpForm">
+      <h2>کد تأیید (OTP)</h2>
+      <input type="text" id="otp" placeholder="کد ارسال شده به موبایل" dir="ltr" maxlength="6">
+      <button type="button" class="btn btn-primary" id="otpSubmit">تأیید</button>
+    </div>
+
+    <div class="card">
+      <h2>وضعیت</h2>
+      <p><span class="status-badge status-idle" id="statusBadge">آماده</span></p>
+      <div id="priceResult" class="price-result" style="display:none; margin-top:0.75rem"></div>
+    </div>
+
+    <div class="card">
+      <h2>لاگ</h2>
+      <div class="log-panel" id="logPanel"></div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let socket;
+    try { socket = io(); } catch (e) { socket = null; }
+    const urlInput = document.getElementById('url');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const phoneForm = document.getElementById('phoneForm');
+    const otpForm = document.getElementById('otpForm');
+    const phoneInput = document.getElementById('phone');
+    const otpInput = document.getElementById('otp');
+    const phoneSubmit = document.getElementById('phoneSubmit');
+    const otpSubmit = document.getElementById('otpSubmit');
+    const statusBadge = document.getElementById('statusBadge');
+    const priceResult = document.getElementById('priceResult');
+    const logPanel = document.getElementById('logPanel');
+
+    const statusLabels = {
+      idle: 'آماده',
+      starting: 'در حال شروع',
+      navigating: 'در حال بارگذاری',
+      login_phone: 'ورود – شماره موبایل',
+      login_otp: 'ورود – کد تأیید',
+      chatting: 'در حال چت',
+      price_found: 'قیمت یافت شد',
+      error: 'خطا'
+    };
+
+    function addLog(level, msg, ts) {
+      const line = document.createElement('div');
+      line.className = `log-line ${level}`;
+      line.innerHTML = `<span class="ts">${ts ? new Date(ts).toLocaleTimeString('fa-IR') : ''}</span> ${escapeHtml(msg)}`;
+      logPanel.appendChild(line);
+      logPanel.scrollTop = logPanel.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function setStatus(status) {
+      statusBadge.textContent = statusLabels[status] || status;
+      statusBadge.className = 'status-badge status-' + status;
+      phoneForm.classList.toggle('visible', status === 'login_phone');
+      otpForm.classList.toggle('visible', status === 'login_otp');
+      startBtn.style.display = status === 'idle' || status === 'error' ? 'block' : 'none';
+      stopBtn.style.display = (status !== 'idle' && status !== 'error') ? 'block' : 'none';
+    }
+
+    if (socket) {
+      socket.on('log', ({ level, msg, ts }) => addLog(level, msg, ts));
+      socket.on('status', (data) => {
+        setStatus(data.status);
+        if (data.priceResult) {
+          priceResult.textContent = data.priceResult;
+          priceResult.style.display = 'block';
+        }
+      });
+    }
+
+    startBtn.addEventListener('click', async () => {
+      const url = urlInput.value.trim();
+      if (!url) return alert('آدرس آگهی را وارد کنید');
+      try {
+        const r = await fetch('/api/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        const j = await r.json();
+        if (!j.ok) alert(j.error || 'خطا');
+      } catch (e) {
+        alert('خطا در ارتباط با سرور');
+      }
+    });
+
+    stopBtn.addEventListener('click', async () => {
+      await fetch('/api/stop', { method: 'POST' });
+    });
+
+    phoneSubmit.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const phone = phoneInput.value.trim();
+      if (!phone) { alert('شماره موبایل را وارد کنید'); return; }
+      phoneSubmit.disabled = true;
+      try {
+        const r = await fetch('/api/login/phone', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) alert(j.error || 'خطا: ' + r.status);
+        else if (j && !j.ok) alert(j.error || 'خطا');
+      } catch (err) {
+        alert('خطا در ارتباط با سرور');
+      } finally {
+        phoneSubmit.disabled = false;
+      }
+    });
+
+    otpSubmit.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const otp = otpInput.value.trim();
+      if (!otp) { alert('کد تأیید را وارد کنید'); return; }
+      otpSubmit.disabled = true;
+      try {
+        const r = await fetch('/api/login/otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ otp })
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) alert(j.error || 'خطا: ' + r.status);
+        else if (j && !j.ok) alert(j.error || 'خطا');
+      } catch (err) {
+        alert('خطا در ارتباط با سرور');
+      } finally {
+        otpSubmit.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
